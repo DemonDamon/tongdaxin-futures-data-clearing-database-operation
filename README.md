@@ -10,7 +10,6 @@
  - 先从通达信上下载1分钟和5分钟的期货数据，操作：系统-盘后数据下载
  - 然后从通达信导出txt或csv文件到指定目录，操作：系统-数据导出-高级导出
  - 启动MongoDB，然后运行tdx_mongodb-operation.py脚本
- - 将tdx_mongodb-operation.py文件放在所下载的通达信数据文件夹的父目录下，启动MongoDB，最后运行该py脚本即可
  注意：这里默认你已经安装好MongoDB、Studio3T（数据可视化工具），并做好了相关配置
 
 开发环境`Python-v3(3.6)`：
@@ -29,11 +28,10 @@
  - data_processing函数，数据预处理函数，返回最终处理后的数据
  - extract_info函数，从数据库中抽取特定标签数据用作去重处理
  - insert_to_database函数，第一次创建数据库的时候，直接插入数据，往后的维护，需要去重处理之后再插入新数据
+ - multi_thread_run函数，单线程处还是有点慢，多线程同时处理多个数据文件导入，效率会高很多，参数：max_threads_num最大线程数量，
+   file_path是通达信txt/csv数据所在文件夹目录
 
 ## * 用法
 
  - 配好运行环境以及安装MongoDB，最好再安装一个MongoDB的可视化管理工具Studio 3T
- - 先运行`run_crawler_cnstock.py`，`run_crawler_jrj.py`，`run_crawler_nbd.py`，`run_crawler_sina.py`，`run_crawler_stcn.py`这5个py文件，而且可能因为对方服务器没有响应而重复多次运行这几个文件才能抓取大量的历史数据
- - 接着运行`run_crawler_tushare.py`从Tushare获取基本信息和股票价格
- - 最后运行`run_main.py`文件，其中有4个步骤，除了第1步初始化外，其他几步最好单独运行
- - 注意：所有程序都必须在文件所在目录下运行
+ - 启动MongoDB，最后运行该py脚本即可，需要设置数据跨度（1分钟还是5分钟）、数据库名称、最大启动线程数量，以及通达信txt/csv数据文件夹路径
