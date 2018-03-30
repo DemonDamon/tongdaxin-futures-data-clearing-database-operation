@@ -31,7 +31,7 @@ class tdx_mongodb_operation(object):
 		Open = []; High = []; Low = []; Close = []
 		Volumn = []; OpenInterest = []
 		for line in open(symbol_path):
-			row = line.split(',')
+			row = line.split(',')			        	
 			if row[0].isdigit():
 				Date.append(row[0])
 				Time.append(row[1])
@@ -148,7 +148,8 @@ class tdx_mongodb_operation(object):
 		date_distinct_list = self.extract_info(['Date'],symbol)
 		if date_distinct_list[0] == []:
 			for i in range(len(latest_processed_data)):
-				data = {'Date' : str(latest_processed_data.iloc[i,0]),
+				data = {'_id' : str(i),
+						'Date' : str(latest_processed_data.iloc[i,0]),
 						'Time' : str(latest_processed_data.iloc[i,1]),
 						'Open' : str(latest_processed_data.iloc[i,2]),
 						'High' : str(latest_processed_data.iloc[i,3]),
@@ -168,7 +169,8 @@ class tdx_mongodb_operation(object):
 			start_insert_ind =  latest_processed_data_1[latest_processed_data_1.Time==last_time].index[0]
 			for i in range(len(latest_processed_data)):
 				if i > start_insert_ind:
-					data = {'Date' : str(latest_processed_data.iloc[i,0]),
+					data = {'_id' : str(i),
+							'Date' : str(latest_processed_data.iloc[i,0]),
 							'Time' : str(latest_processed_data.iloc[i,1]),
 							'Open' : str(latest_processed_data.iloc[i,2]),
 							'High' : str(latest_processed_data.iloc[i,3]),
@@ -187,12 +189,9 @@ class tdx_mongodb_operation(object):
 			ind for ind, symbol_info in enumerate(symbol_info_list)} 
 
 if __name__ == '__main__':
-	tmo = tdx_mongodb_operation("localhost",27017,dataframe=1,database="futures_1min")
-	
-	# # --- single run ---
-	# symbol_info_list = tmo.output_symbol_list("E:\\Quant_Python\\tongdaxin_data\\1min_txt")
-	# for sp,sn in symbol_info_list:
-	# 	tmo.insert_to_database(sp,sn)
-	
-	# --- multi-thread run ---
-	tmo.multi_thread_run(max_threads_num=4,file_path="E:\\Quant_Python\\tongdaxin_data\\1min_txt")
+	Data_Info_Dist = {"dataframe":[1,5],"databasename":["futures_1min_data","futures_5min_data"],\
+	"filepath":["D:\\Quant_Python\\tongdaxin_data\\1min_txt","D:\\Quant_Python\\tongdaxin_data\\5min_txt"]}
+	for i in range(len(Data_Info_Dist["dataframe"])):
+		tmo = tdx_mongodb_operation("localhost",27017,dataframe=Data_Info_Dist["dataframe"][i],\
+			database=Data_Info_Dist["databasename"][i])
+		tmo.multi_thread_run(max_threads_num=4,file_path=Data_Info_Dist["filepath"][i])
